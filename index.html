@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Contract Helper</title>
+    <link rel="stylesheet" href="assets/jquery-ui/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-theme.css" />
+    <style>
+      .form-control[readonly] {
+        cursor: text;
+        background-color: #fcfcfc;
+      }
+      h2 {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+      .controls {
+        margin: 8px;
+      }
+      .calculation {
+        max-width: 350px;
+        margin: 8px;
+      }
+    </style>
+    <script src="assets/jquery.min.js"></script>
+    <script src="assets/jquery-ui/jquery-ui.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/knockout.min.js"></script>
+    <script src="assets/accounting.min.js"></script>
+    <script>
+      var contractTaxRate = 0.0307 + 0.01 + (0.25 + 0.124 + 0.029);       // State, Local, Federal (bracket + social security + Medicare)
+      var salaryTaxRate = 0.25;
+
+      function currency(value) {
+        var result = accounting.formatMoney(value,' $', 0)
+        return result ? result.trim() : '';
+      }
+
+      function computedCurrency(innerObservable) {
+        return ko.computed({
+          read: function() { return currency(innerObservable()); },
+          write: function(value) {
+            value = parseFloat(value.replace(/[^\.\d]/g, ''));
+            innerObservable(isNaN(value) ? 0 : value); // Write to underlying storage
+          }
+        });
+      }
+
+      $(function() {
+        var ContractCalculation = function() {
+          var self = this;
+
+          self.template = 'contract-calculation-template';
+          self.rate = ko.observable(100);
+          self.hoursPerDay = ko.observable(8);
+          self.daysPerWeek = ko.observable(3);
+          self.hoursPerWeek = ko.computed(function() {
+            return self.hoursPerDay() * self.daysPerWeek();
+          });
+          self.monthly = ko.computed(function() {
+            return self.rate() * self.hoursPerWeek() * 4;
+          });
+          self.taxRate = ko.observable(contractTaxRate);
+          self.taxPercent = ko.computed(function() { return (self.taxRate() * 100).toFixed(2); });
+          self.takeHomeRate = ko.computed(function() { return 1 - self.taxRate(); });
+          self.monthlyTaxed = ko.computed(function() {
+            return self.monthly() * self.takeHomeRate();
+          });
+          self.yearly = ko.computed(function() {
+            return self.rate() * self.hoursPerWeek() * 52;
+          });
+        }
+
+        var SalaryCalculation = function() {
+          var self = this;
+
+          self.template = 'salary-calculation-template';
+          self.yearly = ko.observable(100000);
+          self.formattedYearly = computedCurrency(self.yearly);
+          self.monthly = ko.computed({
+            read: function() { return self.yearly() / 12; },
+            write: function(value) { self.yearly(value * 12); }
+          });
+          self.formattedMonthly = computedCurrency(self.monthly);
+          self.taxRate = ko.observable(salaryTaxRate);
+          self.taxPercent = ko.computed(function() { return (self.taxRate() * 100).toFixed(2); });
+          self.takeHomeRate = ko.computed(function() { return 1 - self.taxRate(); });
+          self.monthlyTaxed = ko.computed({
+            read: function() { return self.monthly() * self.takeHomeRate(); },
+            write: function(value) { self.monthly(value / self.takeHomeRate()) }
+          });
+          self.formattedMonthlyTaxed = computedCurrency(self.monthlyTaxed);
+          self.hoursPerDay = ko.observable(8);
+          self.daysPerWeek = ko.observable(5);
+          self.hoursPerWeek = ko.computed(function() {
+            return self.hoursPerDay() * self.daysPerWeek();
+          });
+          self.rate = ko.computed(function() {
+            return (self.yearly() / 52 / self.hoursPerWeek()).toFixed(2);
+          });
+        }
+
+        var ViewModel = function() {
+          var self = this;
+
+          self.calculations = ko.observableArray([]);
+
+          self.addContractCalculation = function() {
+            self.calculations.push(new ContractCalculation());
+          };
+          self.addSalaryCalculation = function() {
+            self.calculations.push(new SalaryCalculation());
+          };
+          self.removeCalculation = function() {
+            self.calculations.remove(this);
+          };
+
+          self.addContractCalculation();
+          self.addSalaryCalculation();
+        }
+
+        ko.applyBindings(new ViewModel());
+      });
+    </script>
+  </head>
+  <body>
+    <div class="page">
+      <div class="controls">
+        <!-- TODO: Presets -->
+
+        <button type="button" data-bind="click: addSalaryCalculation">+ Salary</button>
+        <button type="button" data-bind="click: addContractCalculation">+ Contract</button>
+      </div>
+      <div class="calculations clearfix" data-bind="foreach: calculations">
+        <div class="pull-left" data-bind="template: { name: template }"></div>
+      </div>
+    </div>
+
+    <script type="text/html" id="contract-calculation-template">
+      <div class="calculation">
+        <header>
+          <h2>
+            <a href="#" class="btn btn-link " data-bind="click: $parent.removeCalculation"><span class="glyphicon glyphicon-remove"></span></a>
+            Contract Calculator
+          </h2>
+        </header>
+
+        <form class="form-horizontal" role="form">
+          <div class="form-group">
+            <label for="rate" class="col-sm-6 control-label">Rate</label>
+            <div class="col-sm-6">
+              <input type="number" class="form-control" name="rate" data-bind="value: rate, valueUpdate: 'afterkeydown'" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="hoursPerDay" class="col-sm-6 control-label">Hours / day</label>
+            <div class="col-sm-6">
+              <input type="number" class="form-control" name="hoursPerDay" data-bind="value: hoursPerDay, valueUpdate: 'afterkeydown'" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="daysPerWeek" class="col-sm-6 control-label">Days / week</label>
+            <div class="col-sm-6">
+              <input type="number" class="form-control" name="daysPerWeek" data-bind="value: daysPerWeek, valueUpdate: 'afterkeydown'" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="hoursPerWeek" class="col-sm-6 control-label">Hours / week</label>
+            <div class="col-sm-6">
+              <input type="number" class="form-control" name="hoursPerWeek" data-bind="value: hoursPerWeek" readonly />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="monthly" class="col-sm-6 control-label">Monthly</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control" name="monthly" data-bind="value: currency(monthly())" readonly />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="monthlyTaxed" class="col-sm-6 control-label" data-bind="attr: {title: 'Based on a tax rate of ' + taxPercent() + '%'}">
+              <!-- <a href="#TODO"><span class="glyphicon glyphicon-info-sign"></span></a> -->
+              After Tax
+            </label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control" name="monthlyTaxed" data-bind="value: currency(monthlyTaxed())" readonly />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="yearly" class="col-sm-6 control-label">Yearly</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control" name="yearly" data-bind="value: currency(yearly())" readonly />
+            </div>
+          </div>
+        </form>
+      </div>
+    </script>
+
+    <script type="text/html" id="salary-calculation-template">
+      <div class="calculation">
+        <header>
+          <h2>
+            <a href="#" class="btn btn-link " data-bind="click: $parent.removeCalculation"><span class="glyphicon glyphicon-remove"></span></a>
+            Salary Calculator
+          </h2>
+        </header>
+
+        <form class="form-horizontal" role="form">
+          <div class="form-group">
+            <label for="yearly" class="col-sm-6 control-label">Yearly</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control" name="yearly" data-bind="value: formattedYearly" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="monthly" class="col-sm-6 control-label">Monthly</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control" name="monthly" data-bind="value: formattedMonthly" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="monthlyTaxed" class="col-sm-6 control-label" data-bind="attr: {title: 'Based on a tax rate of ' + taxPercent() + '%'}">After Tax</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control" name="monthlyTaxed" data-bind="value: formattedMonthlyTaxed" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="daysPerWeek" class="col-sm-6 control-label">Days / week</label>
+            <div class="col-sm-6">
+              <input type="number" class="form-control" name="daysPerWeek" data-bind="value: daysPerWeek, valueUpdate: 'afterkeydown'" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="hoursPerDay" class="col-sm-6 control-label">Hours / day</label>
+            <div class="col-sm-6">
+              <input type="number" class="form-control" name="hoursPerDay" data-bind="value: hoursPerDay, valueUpdate: 'afterkeydown'" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="hoursPerWeek" class="col-sm-6 control-label">Hours / week</label>
+            <div class="col-sm-6">
+              <input type="number" class="form-control" name="hoursPerWeek" data-bind="value: hoursPerWeek" readonly />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="rate" class="col-sm-6 control-label">Equivalent Rate</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control" name="rate" data-bind="value: rate" readonly />
+            </div>
+          </div>
+        </form>
+      </div>
+    </script>
+  </body>
+</html>
