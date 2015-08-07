@@ -31,8 +31,8 @@
     <script>
       var initialRate = 100;
       var initialSalary = 100000;
-      var contractTaxRate = 0.0307 + 0.01 + (0.25 + 0.124 + 0.029);       // State, Local, Federal (bracket + social security + Medicare)
-      var salaryTaxRate = 0.25;
+      var contractTaxRate = 0.0307 + 0.01 + (0.25 + 0.124 + 0.029);       // State + Local + Federal + (bracket + social security + Medicare) in 2015
+      var salaryTaxRate = 0.237235;  // Observed in PA excluding benefits (other values: 0.25 original estimate, 0.2377 original calculation) in 2015
 
       function currency(value) {
         var result = accounting.formatMoney(value,' $', 2)
