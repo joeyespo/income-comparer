@@ -15,8 +15,14 @@
         text-align: center;
         margin-bottom: 24px;
       }
+      h4 {
+        margin-top: 24px;
+      }
       .controls {
         margin: 8px;
+      }
+      .form-horizontal .text-left {
+        text-align: left;
       }
       .calculation {
         max-width: 350px;
@@ -25,6 +31,10 @@
       .hover {
         cursor: pointer;
         border-bottom: 1px dotted #888;
+      }
+      a.text,
+      .hover a {
+        color: #333;
       }
     </style>
     <script src="assets/jquery.min.js"></script>
@@ -60,7 +70,7 @@
       }
 
       $(function() {
-        var ContractCalculation = function() {
+        var ContractCalculation = function(taxRateObservable) {
           var self = this;
 
           self.template = 'contract-calculation-template';
@@ -73,7 +83,8 @@
           self.monthly = ko.computed(function() {
             return self.rate() * self.hoursPerWeek() * 4;
           });
-          self.taxRate = ko.observable(contractTaxRate);
+          self.stateTaxes = ko.observable();
+          self.taxRate = taxRateObservable;
           self.taxPercent = ko.computed(function() { return (self.taxRate() * 100).toFixed(2); });
           self.takeHomeRate = ko.computed(function() { return 1 - self.taxRate(); });
           self.monthlyTaxed = ko.computed(function() {
@@ -84,7 +95,7 @@
           });
         }
 
-        var SalaryCalculation = function() {
+        var SalaryCalculation = function(taxRateObservable) {
           var self = this;
 
           self.template = 'salary-calculation-template';
@@ -95,7 +106,7 @@
             write: function(value) { self.yearly(value * 12); }
           });
           self.formattedMonthly = computedCurrency(self.monthly);
-          self.taxRate = ko.observable(salaryTaxRate);
+          self.taxRate = taxRateObservable;
           self.taxPercent = ko.computed(function() { return (self.taxRate() * 100).toFixed(2); });
           self.takeHomeRate = ko.computed(function() { return 1 - self.taxRate(); });
           self.monthlyTaxed = ko.computed({
@@ -116,13 +127,15 @@
         var ViewModel = function() {
           var self = this;
 
+          self.contractTaxRate = ko.observable(contractTaxRate);
+          self.salaryTaxRate = ko.observable(salaryTaxRate);
           self.calculations = ko.observableArray([]);
 
           self.addContractCalculation = function() {
-            self.calculations.push(new ContractCalculation());
+            self.calculations.push(new ContractCalculation(self.contractTaxRate));
           };
           self.addSalaryCalculation = function() {
-            self.calculations.push(new SalaryCalculation());
+            self.calculations.push(new SalaryCalculation(self.salaryTaxRate));
           };
           self.removeCalculation = function() {
             self.calculations.remove(this);
@@ -147,10 +160,62 @@
 
         <button type="button" data-bind="click: addSalaryCalculation">+ Salary</button>
         <button type="button" data-bind="click: addContractCalculation">+ Contract</button>
+        <button type="button" data-toggle="modal" data-target="#taxInfo">Show Tax Information</button>
       </div>
       <div class="calculations clearfix" data-bind="foreach: calculations">
         <div class="pull-left" data-bind="template: { name: template }"></div>
       </div>
+      <div class="modal fade" id="taxInfo" tabindex="-1" role="dialog" aria-labelledby="taxInfoLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="taxInfoLabel">Tax Information</h4>
+            </div>
+            <div class="modal-body">
+              <div class="info info-warning"></div>
+              <form class="form-horizontal" role="form">
+                <div class="form-group">
+                  <label for="rate" class="col-sm-4 control-label">
+                    Contract Tax Rate
+                    <span data-toggle="tooltip" data-placement="right" data-container="body" title="State + Local + Federal (Tax Bracket + Social Security + Medicare)"><i class="glyphicon glyphicon-question-sign"></i></span>
+                  </label>
+                  <div class="col-sm-3">
+                    <input type="number" class="form-control rate" name="rate" data-bind="value: contractTaxRate, valueUpdate: 'afterkeydown'" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="rate" class="col-sm-4 control-label">
+                    Salary Tax Rate
+                    <span data-toggle="tooltip" data-placement="right" data-container="body" title="This rate is based solely on the author's observed rate. You probably need to change this."><i class="glyphicon glyphicon-question-sign"></i></span>
+                  </label>
+                  <div class="col-sm-3">
+                    <input type="number" class="form-control rate" name="rate" data-bind="value: salaryTaxRate, valueUpdate: 'afterkeydown'" />
+                  </div>
+                </div>
+              </form>
+              <h4>Disclaimer</h4>
+              <p>
+                The initial numbers are most likely incorrect for you. Please do your own research, talk to a tax consultant,
+                and fill in the appropriate numbers for more accurate calculations.
+              </p>
+              <h4>Resources</h4>
+              <ul>
+                <li><a href="http://www.adp.com/tools-and-resources/calculators-and-tools/payroll-calculators/salary-paycheck-calculator.aspx" target="_blank">Salary Paycheck Calculator</a> (adp.com)</li>
+                <li><a href="http://taxfoundation.org/article/2015-tax-brackets" target="_blank">2015 Estimated Income Tax Brackets and Rates</a> (taxfoundation.org)</li>
+                <li><a href="http://www.bankrate.com/finance/taxes/tax-brackets.aspx" target="_blank">Tax Brackets</a> (bankrate.com)</li>
+              </ul>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-meta">
+      <a href="https://github.com/joeyespo/income-calculator"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
     </div>
 
     <script type="text/html" id="contract-calculation-template">
@@ -195,7 +260,7 @@
           </div>
           <div class="form-group">
             <label for="monthlyTaxed" class="col-sm-6 control-label">
-              After <span class="hover" data-toggle="tooltip" data-placement="bottom" data-container="body" data-bind="attr: {'data-original-title': 'Based on a tax rate of ' + taxPercent() + '%'}">Tax</span>
+              After <span class="hover" data-toggle="tooltip" data-placement="bottom" data-container="body" data-bind="attr: {'data-original-title': 'Based on a tax rate of ' + taxPercent() + '%'}"><a href="#" data-toggle="modal" data-target="#taxInfo">Tax</a></span>
             </label>
             <div class="col-sm-6">
               <input type="text" class="form-control" name="monthlyTaxed" data-bind="value: currency(monthlyTaxed())" readonly />
@@ -235,7 +300,7 @@
           </div>
           <div class="form-group">
             <label for="monthlyTaxed" class="col-sm-6 control-label">
-              After <span class="hover" data-toggle="tooltip" data-placement="bottom" data-container="body" data-bind="attr: {'data-original-title': 'Based on a tax rate of ' + taxPercent() + '%'}">Tax</span>
+              After <span class="hover" data-toggle="tooltip" data-placement="bottom" data-container="body" data-bind="attr: {'data-original-title': 'Based on a tax rate of ' + taxPercent() + '%'}"><a href="#" data-toggle="modal" data-target="#taxInfo">Tax</a></span>
             </label>
             <div class="col-sm-6">
               <input type="text" class="form-control" name="monthlyTaxed" data-bind="value: formattedMonthlyTaxed" />
