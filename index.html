@@ -33,8 +33,14 @@
       var salaryTaxRate = 0.25;
 
       function currency(value) {
-        var result = accounting.formatMoney(value,' $', 0)
-        return result ? result.trim() : '';
+        var result = accounting.formatMoney(value,' $', 2)
+        if (!result) {
+          return '';
+        }
+        if (result.lastIndexOf('.00') == result.length - 3) {
+          result = result.substring(0, result.length - 3);
+        }
+        return result.trim();
       }
 
       function computedCurrency(innerObservable) {
