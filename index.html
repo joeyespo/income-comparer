@@ -51,8 +51,18 @@
     <script>
       var initialRate = 100;
       var initialSalary = 100000;
-      var contractTaxRate = 0.0307 + 0.01 + (0.25 + 0.124 + 0.029);       // State + Local + Federal + (bracket + social security + Medicare) in 2015
-      var salaryTaxRate = 0.237235;  // Observed in PA excluding benefits (other values: 0.25 original estimate, 0.2377 original calculation) in 2015
+
+      // [Updated 2014] Taken from numerous websites -- Remember, your salary affects your tax bracket!
+      var contractTaxRate = 0.0307 + 0.01 + (0.25 + 0.124 + 0.029);       // State + Local + Federal (Tax Bracket + Social Security + Medicare)
+      // [Updated 2015] Observed in PA excluding benefits (previous values: 0.25 original estimate, 0.2377 original calculation)
+      var salaryTaxRate = 0.237235;  // Observed in PA excluding benefits (other values: 0.25 original estimate, 0.2377 original calculation)
+
+      // Fix rounding errors
+      contractTaxRate = parseFloat(contractTaxRate.toPrecision(12));
+
+      // TODO: Pull tax information from the web
+      // TODO: Use tax numbers based on your location
+      // TODO: Adjust tax bracket automatically based on entered salary
 
       function currency(value) {
         var result = accounting.formatMoney(value,' $', 2)
