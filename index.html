@@ -55,7 +55,7 @@
       // [Updated 2014] Taken from numerous websites -- Remember, your salary affects your tax bracket!
       var contractTaxRate = 0.0307 + 0.01 + (0.28 + 0.124 + 0.029);       // State (PA) + Local + Federal (Tax Bracket + Social Security + Medicare)
       // [Updated 2015] Observed in PA excluding benefits (previous values: 0.25 original estimate, 0.2377 original calculation)
-      var salaryTaxRate = 0.237235;  // Observed in PA excluding benefits (other values: 0.25 original estimate, 0.2377 original calculation)
+      var salaryTaxRate = 0.2894;  // Average tax rate in PA (see the Tax Calculator link)
 
       // Fix rounding errors
       contractTaxRate = parseFloat(contractTaxRate.toPrecision(12));
@@ -196,7 +196,7 @@
                 <div class="form-group">
                   <label for="rate" class="col-sm-4 control-label">
                     Contract Tax Rate
-                    <span data-toggle="tooltip" data-placement="right" data-container="body" title="State + Local + Federal (Tax Bracket + Social Security + Medicare)"><i class="glyphicon glyphicon-question-sign"></i></span>
+                    <span data-toggle="tooltip" data-placement="right" data-container="body" title="This rate is based on the average tax rate for this bracket in PA. More specifically, State + Local + Federal (Tax Bracket + Social Security + Medicare)"><i class="glyphicon glyphicon-question-sign"></i></span>
                   </label>
                   <div class="col-sm-3">
                     <input type="number" class="form-control rate" name="rate" data-bind="value: contractTaxRate, valueUpdate: 'afterkeydown'" />
@@ -205,7 +205,7 @@
                 <div class="form-group">
                   <label for="rate" class="col-sm-4 control-label">
                     Salary Tax Rate
-                    <span data-toggle="tooltip" data-placement="right" data-container="body" title="This rate is based solely on the author's observed rate. You probably need to change this."><i class="glyphicon glyphicon-question-sign"></i></span>
+                    <span data-toggle="tooltip" data-placement="right" data-container="body" title="This rate is based on the average tax rate for this bracket in PA. You probably need to change this."><i class="glyphicon glyphicon-question-sign"></i></span>
                   </label>
                   <div class="col-sm-3">
                     <input type="number" class="form-control rate" name="rate" data-bind="value: salaryTaxRate, valueUpdate: 'afterkeydown'" />
@@ -219,9 +219,9 @@
               </p>
               <h4>Resources</h4>
               <ul>
-                <li><a href="http://www.adp.com/tools-and-resources/calculators-and-tools/payroll-calculators/salary-paycheck-calculator.aspx" target="_blank">Salary Paycheck Calculator</a> (adp.com)</li>
-                <li><a href="http://taxfoundation.org/article/2015-tax-brackets" target="_blank">2015 Estimated Income Tax Brackets and Rates</a> (taxfoundation.org)</li>
+                <li><a href="http://www.adp.com/tools-and-resources/calculators-and-tools/payroll-calculators/salary-paycheck-calculator.aspx" target="_blank">Salary Calculator</a> (adp.com)</li>
                 <li><a href="http://www.bankrate.com/finance/taxes/tax-brackets.aspx" target="_blank">Tax Brackets</a> (bankrate.com)</li>
+                <li><a href="http://neuvoo.com/tax-calculator/?salary=100000&region=Pennsylvania" target="_blank">Tax Calculator</a> (neuvoo.com)</li>
               </ul>
             </div>
             <div class="modal-footer">
