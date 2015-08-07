@@ -11,6 +11,12 @@
         cursor: text;
         background-color: #fcfcfc;
       }
+      /* Remove spin buttons from decimal number inputs */
+      input[type=number].rate::-webkit-inner-spin-button,
+      input[type=number].rate::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+      }
       h2 {
         text-align: center;
         margin-bottom: 24px;
