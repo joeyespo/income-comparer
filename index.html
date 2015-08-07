@@ -75,6 +75,7 @@
         });
       }
 
+      // Initialize Knockout
       $(function() {
         var ContractCalculation = function(taxRateObservable) {
           var self = this;
@@ -154,6 +155,7 @@
         ko.applyBindings(new ViewModel());
       });
 
+      // Initialize Bootstrap JavaScript components
       $(function () {
         $('[data-toggle="tooltip"]').tooltip()
       })
