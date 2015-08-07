@@ -29,6 +29,8 @@
     <script src="assets/knockout.min.js"></script>
     <script src="assets/accounting.min.js"></script>
     <script>
+      var initialRate = 100;
+      var initialSalary = 100000;
       var contractTaxRate = 0.0307 + 0.01 + (0.25 + 0.124 + 0.029);       // State, Local, Federal (bracket + social security + Medicare)
       var salaryTaxRate = 0.25;
 
@@ -58,7 +60,7 @@
           var self = this;
 
           self.template = 'contract-calculation-template';
-          self.rate = ko.observable(100);
+          self.rate = ko.observable(initialRate);
           self.hoursPerDay = ko.observable(8);
           self.daysPerWeek = ko.observable(3);
           self.hoursPerWeek = ko.computed(function() {
@@ -82,7 +84,7 @@
           var self = this;
 
           self.template = 'salary-calculation-template';
-          self.yearly = ko.observable(100000);
+          self.yearly = ko.observable(initialSalary);
           self.formattedYearly = computedCurrency(self.yearly);
           self.monthly = ko.computed({
             read: function() { return self.yearly() / 12; },
