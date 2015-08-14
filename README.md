@@ -1,11 +1,11 @@
-Income Calculator
------------------
+Income Comparer
+---------------
 
 Quickly calculate and compare income between salary and hourly, number of days
 per week, and how many hours per day. Get a more accurate income prediction
 based on your personal needs, or use to compare value during a negotiation.
 
-[See it in action](http://joeyespo.com/income-calculator).
+[See it in action](http://joeyespo.com/income-comparer).
 
 
 #### Disclaimer
@@ -17,7 +17,7 @@ Be sure to do your own research and adjust your tax information!
 Screenshot
 ----------
 
-[![Screenshot](screenshot.png)](http://joeyespo.com/income-calculator)
+[![Screenshot](screenshot.png)](http://joeyespo.com/income-comparer)
 
 
 Contributing
