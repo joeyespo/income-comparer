@@ -18,11 +18,16 @@
           margin: 0;
       }
       h2 {
-        text-align: center;
+        text-align: right;
         margin-bottom: 24px;
       }
       h4 {
         margin-top: 24px;
+      }
+      .btn-close {
+        color: #333;
+        padding-left: 0;
+        padding-right: 0;
       }
       .controls {
         margin: 8px;
@@ -240,8 +245,8 @@
       <div class="calculation">
         <header>
           <h2>
-            <a href="#" class="btn btn-link " data-bind="click: $parent.removeCalculation"><span class="glyphicon glyphicon-remove"></span></a>
             Contract Calculator
+            <a href="#" class="btn btn-link btn-close" data-bind="click: $parent.removeCalculation"><span class="glyphicon glyphicon-remove"></span></a>
           </h2>
         </header>
 
@@ -298,8 +303,8 @@
       <div class="calculation">
         <header>
           <h2>
-            <a href="#" class="btn btn-link " data-bind="click: $parent.removeCalculation"><span class="glyphicon glyphicon-remove"></span></a>
             Salary Calculator
+            <a href="#" class="btn btn-link btn-close" data-bind="click: $parent.removeCalculation"><span class="glyphicon glyphicon-remove"></span></a>
           </h2>
         </header>
 
