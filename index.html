@@ -24,6 +24,20 @@
       h4 {
         margin-top: 24px;
       }
+      .author {
+        position: absolute;
+        right: 12px;
+        bottom: 12px;
+        color: #aaa;
+      }
+      .author a,
+      .author a:hover,
+      .author a:focus {
+        color: #aaa;
+      }
+      .symbol {
+        color: #bbb;
+      }
       .btn-close {
         color: #333;
         padding-left: 0;
@@ -184,6 +198,7 @@
         <button type="button" data-bind="click: addSalaryCalculation">+ Salary</button>
         <button type="button" data-bind="click: addContractCalculation">+ Contract</button>
         <button type="button" data-toggle="modal" data-target="#taxInfo">Show Tax Information</button>
+        <span class="author">Made with <span class="symbol">&hearts;</span> by <a href="http://joeyespo.com" target="_blank">Joe Esposito</a></span>
       </div>
       <div class="calculations clearfix" data-bind="foreach: calculations">
         <div class="pull-left" data-bind="template: { name: template }"></div>
