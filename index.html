@@ -74,7 +74,7 @@
       // [Updated 2014] Taken from numerous websites -- Remember, your salary affects your tax bracket!
       var contractTaxRate = 0.0307 + 0.01 + (0.28 + 0.124 + 0.029);       // State (PA) + Local + Federal (Tax Bracket + Social Security + Medicare)
       // [Updated 2015] Observed in PA excluding benefits (previous values: 0.25 original estimate, 0.2377 original calculation)
-      var salaryTaxRate = 0.2894;  // Average tax rate in PA (see the Tax Calculator link)
+      var salaryTaxRate = 0.237235;  // Observed by author excluding benefits (other values: 0.25 original estimate, 0.2377 original calculation)
 
       // Fix rounding errors
       contractTaxRate = parseFloat(contractTaxRate.toPrecision(12));
