@@ -112,7 +112,7 @@
           self.template = 'contract-calculation-template';
           self.rate = ko.observable(initialRate);
           self.hoursPerDay = ko.observable(8);
-          self.daysPerWeek = ko.observable(3);
+          self.daysPerWeek = ko.observable(5);
           self.hoursPerWeek = ko.computed(function() {
             return self.hoursPerDay() * self.daysPerWeek();
           });
